@@ -47,6 +47,7 @@ class _CodeAuthState extends State<CodeAuth>
         // CALL VERIFY METHOD
         context.read<AuthNotifier>().verifySecret(secretCodeController.text).then((value){
           if(value){
+            secretCodeController.clear();
             context.read<RootPageNotifier>().animateToIndex(1);
             CustomSnackBar.openIconSnackBar(context, "</${context.read<AuthNotifier>().currentSpyder.name}>", const Icon(Icons.done));
           }else{

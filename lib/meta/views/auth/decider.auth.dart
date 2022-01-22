@@ -28,7 +28,7 @@ class _AuthDeciderState extends State<AuthDecider> {
                 debugPrint("LOGGED IN AS: ${auth.data}");
                 return RootAuth(isSessionAvailable: true, id: auth.data,);
               }else{
-                return RootAuth();
+                return RootAuth(isSessionAvailable: false,);
               }
             });
       },

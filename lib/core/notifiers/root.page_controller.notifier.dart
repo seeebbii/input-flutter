@@ -16,8 +16,10 @@ class RootPageNotifier extends ChangeNotifier {
     initialPage: 0,
   );
 
-  void animateToIndex(int padeIndex) {
-    pageViewController.animateToPage(1,
+  void animateToIndex(int pageIndex) {
+    pageViewController.animateToPage(pageIndex,
         duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
+    _currentPageIndex = pageIndex;
+    notifyListeners();
   }
 }

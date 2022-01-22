@@ -13,14 +13,14 @@ class AuthNotifier extends ChangeNotifier {
       saveUserState(currentSpyder.userId!, currentSpyder.name!);
     }
     notifyListeners();
-    return currentSpyder.userId != null;
+    return currentSpyder.userId != null && currentSpyder.userId != '';
   }
 
   Future<bool> renewSession(String id) async {
     currentSpyder = await ApiClient.authService.getUserById(id: id);
     debugPrint(currentSpyder.toJson().toString());
     notifyListeners();
-    return currentSpyder.userId != null;
+    return currentSpyder.userId != null && currentSpyder.userId != '';
   }
 
   Future<String?> getUserId() async {
@@ -35,4 +35,12 @@ class AuthNotifier extends ChangeNotifier {
     SharedPref().pref.setString('user-id', userId);
     SharedPref().pref.setString('name', name);
   }
+
+  void destroyUserState(){
+    currentSpyder = AuthModel.emptyAuth();
+    notifyListeners();
+    SharedPref().pref.remove('user-id');
+    SharedPref().pref.remove('name');
+  }
+
 }
