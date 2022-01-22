@@ -53,6 +53,7 @@ dependencies:
   responsive_framework: ^0.1.5
   animated_text_kit: ^4.2.1
   connectivity_plus: ^2.2.0
+  socket_io_client: ^1.0.2
 
   # extras
   google_fonts: ^2.2.0

@@ -4,6 +4,8 @@ import 'package:input_flutter/core/notifiers/root.page_controller.notifier.dart'
 import 'package:input_flutter/meta/utils/app_theme.dart';
 import 'package:provider/provider.dart';
 
+import '../../../core/notifiers/socket.notifier.dart';
+
 class HomeChat extends StatefulWidget {
   const HomeChat({Key? key}) : super(key: key);
 
@@ -13,6 +15,12 @@ class HomeChat extends StatefulWidget {
 
 class _HomeChatState extends State<HomeChat>
     with AutomaticKeepAliveClientMixin<HomeChat> {
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(

@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../../core/notifiers/connectivity.notifier.dart';
 import '../../core/notifiers/root.page_controller.notifier.dart';
+import '../../core/notifiers/socket.notifier.dart';
 
 class MultiProviders extends StatelessWidget {
   const MultiProviders(this.child, {Key? key}) : super(key: key);
@@ -25,6 +26,10 @@ class MultiProviders extends StatelessWidget {
 
         ChangeNotifierProvider<ConnectionNotifier>(
           create: (BuildContext context) => ConnectionNotifier(),
+        ),
+
+        ChangeNotifierProvider<SocketNotifier>(
+          create: (BuildContext context) => SocketNotifier(),
         ),
       ],
       child: child,

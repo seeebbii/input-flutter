@@ -38,7 +38,6 @@ class _MainSplashState extends State<MainSplash> with SingleTickerProviderStateM
     super.initState();
     Future.delayed(const Duration(milliseconds: 800), toggleImageBool);
     Future.delayed(const Duration(milliseconds: 1200), toggleTextBool);
-
     // REMOVING SPLASH SCREEN
     Future.delayed(const Duration(seconds: 10), ()=> navigationController.getOffAll(RouteGenerator.authDecider));
   }

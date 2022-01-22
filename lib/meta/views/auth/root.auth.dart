@@ -13,6 +13,7 @@ import '../../../components/dialogs/custom_snackbars.dart';
 import '../../../core/notifiers/auth.notifier.dart';
 import '../../../core/notifiers/connectivity.notifier.dart';
 import '../../../core/notifiers/root.page_controller.notifier.dart';
+import '../../../core/notifiers/socket.notifier.dart';
 import '../../utils/app_theme.dart';
 
 class RootAuth extends StatefulWidget {
@@ -116,7 +117,14 @@ class _RootAuthState extends State<RootAuth>
                   return PageView(
                     physics: const NeverScrollableScrollPhysics(),
                     controller: rootPageNotifier.pageViewController,
-                    onPageChanged: rootPageNotifier.updatePageIndex,
+                    onPageChanged: (index) {
+                      rootPageNotifier.updatePageIndex(index);
+                      if (index == 0) {
+                        context.read<SocketNotifier>().disconnectServer();
+                      } else {
+                        context.read<SocketNotifier>().init();
+                      }
+                    },
                     children: const [CodeAuth(), HomeChat()],
                   );
                 },
@@ -140,12 +148,15 @@ class _RootAuthState extends State<RootAuth>
               child: size.width < 800
                   ? const SizedBox.shrink()
                   : Consumer<RootPageNotifier>(
-                      builder: (BuildContext context, rootPageNotifier, Widget? child) {
+                      builder: (BuildContext context, rootPageNotifier,
+                          Widget? child) {
                         return Text(
                           _timeString,
                           style: TextStyle(
                               fontSize: 12,
-                              color: rootPageNotifier.currentPageIndex == 0 ? Colors.black : Colors.white,
+                              color: rootPageNotifier.currentPageIndex == 0
+                                  ? Colors.black
+                                  : Colors.white,
                               letterSpacing: 1,
                               fontFamily: "Consolas"),
                         );

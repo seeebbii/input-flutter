@@ -10,6 +10,7 @@ import 'package:input_flutter/components/widgets/my_text_field.dart';
 import 'package:input_flutter/core/notifiers/auth.notifier.dart';
 import 'package:input_flutter/core/notifiers/connectivity.notifier.dart';
 import 'package:input_flutter/core/notifiers/root.page_controller.notifier.dart';
+import 'package:input_flutter/core/notifiers/socket.notifier.dart';
 import 'package:input_flutter/meta/utils/app_theme.dart';
 import 'package:provider/provider.dart';
 
@@ -45,10 +46,11 @@ class _CodeAuthState extends State<CodeAuth>
 
       if(context.read<ConnectionNotifier>().isOnline){
         // CALL VERIFY METHOD
-        context.read<AuthNotifier>().verifySecret(secretCodeController.text).then((value){
+        context.read<AuthNotifier>().verifySecret(secretCodeController.text.trim()).then((value){
           if(value){
             secretCodeController.clear();
             context.read<RootPageNotifier>().animateToIndex(1);
+
             CustomSnackBar.openIconSnackBar(context, "</${context.read<AuthNotifier>().currentSpyder.name}>", const Icon(Icons.done));
           }else{
             CustomSnackBar.openErrorSnackBar(context, "An error has occurred",);
