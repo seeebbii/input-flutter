@@ -52,9 +52,11 @@ dependencies:
   intl: ^0.17.0
   responsive_framework: ^0.1.5
   animated_text_kit: ^4.2.1
+  connectivity_plus: ^2.2.0
 
   # extras
   google_fonts: ^2.2.0
+  universal_html: ^2.0.8
 
 dev_dependencies:
   flutter_test:

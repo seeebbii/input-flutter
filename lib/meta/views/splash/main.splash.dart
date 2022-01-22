@@ -5,9 +5,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:input_flutter/app/constants/assets.constant.dart';
-import 'package:input_flutter/core/notifiers/platform.notifier.dart';
-import 'package:provider/provider.dart';
-
+import 'package:input_flutter/app/constants/controller.constant.dart';
+import '../../../core/router/router_generator.dart';
 import '../../utils/app_theme.dart';
 
 class MainSplash extends StatefulWidget {
@@ -17,7 +16,7 @@ class MainSplash extends StatefulWidget {
   _MainSplashState createState() => _MainSplashState();
 }
 
-class _MainSplashState extends State<MainSplash> {
+class _MainSplashState extends State<MainSplash> with SingleTickerProviderStateMixin{
 
   bool renderImage = false;
   bool renderText = false;
@@ -39,6 +38,9 @@ class _MainSplashState extends State<MainSplash> {
     super.initState();
     Future.delayed(const Duration(milliseconds: 800), toggleImageBool);
     Future.delayed(const Duration(milliseconds: 1200), toggleTextBool);
+
+    // REMOVING SPLASH SCREEN
+    Future.delayed(const Duration(seconds: 10), ()=> navigationController.getOffAll(RouteGenerator.authDecider));
   }
 
 
@@ -47,7 +49,6 @@ class _MainSplashState extends State<MainSplash> {
     // var size = MediaQuery.of(context).size;
     return ScreenUtilInit(
       builder: () => Scaffold(
-        backgroundColor: AppTheme.darkBackgroundColor,
         body: Container(
           decoration: const BoxDecoration(
               image: DecorationImage(
@@ -55,30 +56,31 @@ class _MainSplashState extends State<MainSplash> {
               ),
           ),
           child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 3.0, sigmaY: 3.0),
+            filter: ImageFilter.blur(sigmaX: 7.0, sigmaY: 7.0),
             child: Center(
               child: Column(
                 // mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   renderImage ? SizedBox(
-                      height: 0.5.sh,
-                      child: Image.asset(
+                    height: 0.5.sh,
+                    child: Image.asset(
                         Assets.appLogo,
-                        filterQuality: FilterQuality.high,
+                        filterQuality: FilterQuality.low,
                         fit: BoxFit.cover,
-                      )) : const SizedBox.shrink(),
+                      ),
+                  ) : const SizedBox.shrink(),
                   SizedBox(
                     height: 0.15.sp,
                   ),
                   renderText ? DefaultTextStyle(
                     style: const TextStyle(
                       fontSize: 9.0,
-                      fontFamily: 'Agne',
+                      fontFamily: 'Consolas',
                     ),
                     child: AnimatedTextKit(
                       isRepeatingAnimation: false,
                       animatedTexts: [
-                        TypewriterAnimatedText('C:\\User\\Root>input --init', textStyle: Theme.of(context).textTheme.bodyText1?.copyWith(fontSize: defaultTargetPlatform == TargetPlatform.android ? 15 : 18),
+                        TypewriterAnimatedText('C:\\User\\Root>input --init', textStyle: Theme.of(context).textTheme.bodyText1?.copyWith(fontSize: defaultTargetPlatform == TargetPlatform.android ? 15.sm : 18.sm),
                             speed: const Duration(milliseconds: 300), curve: Curves.decelerate, ),
                       ],
                     ),
@@ -91,5 +93,7 @@ class _MainSplashState extends State<MainSplash> {
       ),
     );
   }
+
+
 
 }
