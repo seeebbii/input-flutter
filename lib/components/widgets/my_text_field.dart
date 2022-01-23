@@ -15,7 +15,7 @@ class MyTextField extends StatelessWidget {
   dynamic validator;
   TextInputAction action;
   TextInputType keyType;
-
+  TextAlign align;
   Widget suffixIcon;
   List<TextInputFormatter>? formatter = [];
 
@@ -31,7 +31,9 @@ class MyTextField extends StatelessWidget {
     required this.action,
     required this.keyType,
     required this.suffixIcon,
-    this.hintText, this.formatter = const [], this.validateMode = AutovalidateMode.disabled, required this.onSubmit,  this.prefix}) : super(key: key);
+    this.hintText, this.formatter = const [],
+    required this.align,
+    this.validateMode = AutovalidateMode.disabled, required this.onSubmit,  this.prefix}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -47,13 +49,13 @@ class MyTextField extends StatelessWidget {
         onFieldSubmitted:  (str){
           onSubmit(str);
         },
-        textAlign: TextAlign.center,
+        textAlign: align,
         controller: controller,
         style: Theme
             .of(context)
             .textTheme
-            .bodyText1,
-        cursorWidth: 1,
+            .bodyText2?.copyWith(fontSize: 15.sm),
+        cursorWidth: 2.5,
         textInputAction: action,
         keyboardType: keyType,
         autovalidateMode: validateMode,
@@ -64,7 +66,7 @@ class MyTextField extends StatelessWidget {
           hintStyle: Theme
               .of(context)
               .inputDecorationTheme
-              .hintStyle,
+              .hintStyle?.copyWith(fontSize: 13.sm),
           suffixIcon: suffixIcon,
           prefix: prefix
         ),

@@ -22,7 +22,7 @@ class MyElevatedButton extends StatelessWidget {
           child: Text(
             buttonText,
             style: Theme.of(context).textTheme.bodyText1?.copyWith(
-                fontSize: 11.sm,
+                fontSize: 12.sm,
                 color: Colors.white54,
                 fontWeight: FontWeight.w600,
                 letterSpacing: 1),

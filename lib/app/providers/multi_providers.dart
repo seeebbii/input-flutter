@@ -1,6 +1,9 @@
 
 import 'package:flutter/material.dart';
+import 'package:input_flutter/core/models/chat.model.dart';
+import 'package:input_flutter/core/notifiers/active_users.notifier.dart';
 import 'package:input_flutter/core/notifiers/auth.notifier.dart';
+import 'package:input_flutter/core/notifiers/chat.notifier.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/notifiers/connectivity.notifier.dart';
@@ -30,6 +33,20 @@ class MultiProviders extends StatelessWidget {
 
         ChangeNotifierProvider<SocketNotifier>(
           create: (BuildContext context) => SocketNotifier(),
+        ),
+
+        // ChangeNotifierProvider.value(value: SocketNotifier(),),
+
+        ChangeNotifierProvider<ChatNotifier>(
+          create: (BuildContext context) => ChatNotifier(),
+        ),
+
+
+
+
+
+        ChangeNotifierProvider<ActiveUsersNotifier>(
+          create: (BuildContext context) => ActiveUsersNotifier(),
         ),
       ],
       child: child,

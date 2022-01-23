@@ -1,18 +1,41 @@
+import 'package:flutter/src/widgets/framework.dart';
+import 'package:input_flutter/core/notifiers/chat.notifier.dart';
 import 'package:input_flutter/meta/utils/shared_pref.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:flutter/foundation.dart';
+import 'package:provider/provider.dart';
+import '../models/chat.model.dart';
 
 class SocketNotifier extends ChangeNotifier {
+
+  ChatNotifier? _chatNotifier;
+  late BuildContext context;
   late IO.Socket socket;
   String mySocketId = "";
 
-  void init() {
+  void init(BuildContext ctx) {
+    context = ctx;
+    notifyListeners();
     connectServer();
   }
 
+  // SocketNotifier(this._chatNotifier) {
+  //   if (_chatNotifier != null) {
+  //     print("YOU CAN USE CHAT NOTIFIER NOW");
+  //     print(_chatNotifier);
+  //     // if (_chatNotifier.loggedIn) fetchMessages();
+  //   }
+  // }
+
+
+  void emitChatMessage(ChatModel chatModel){
+    socket.emit('receive_message', chatModel.toJson());
+    notifyListeners();
+  } 
+
   void connectServer() {
     socket = IO.io('https://input-server.herokuapp.com/', <String, dynamic>{
-      'transports': ['websocket', 'polling' ],
+      'transports': ['websocket', ],
       'autoConnect': false,
     }).connect();
 
@@ -28,6 +51,12 @@ class SocketNotifier extends ChangeNotifier {
 
     socket.on('disconnect', (val) {
 
+    });
+
+    socket.on('send_message', (chatModelObject) {
+      ChatModel newChatMessage = ChatModel.fromJson(chatModelObject);
+      print(newChatMessage);
+      context.read<ChatNotifier>().addNewMessage(newChatMessage);
     });
 
 
@@ -60,13 +89,13 @@ class SocketNotifier extends ChangeNotifier {
 
     socket.onDisconnect((_) {
       debugPrint('Socket disconnected');
-      String? name = SharedPref().pref.getString('name');
-      String? userId = SharedPref().pref.getString('user-id');
-      socket.emit('socket-disconnected', {"socketId" : mySocketId,"connectionStatus": "Disconnected", "userName": name, "userId": userId, });
     });
   }
 
   void disconnectServer() {
+    String? name = SharedPref().pref.getString('name');
+    String? userId = SharedPref().pref.getString('user-id');
+    socket.emit('socket-disconnected', {"socketId" : mySocketId,"connectionStatus": "Disconnected", "userName": name, "userId": userId, });
     socket.disconnect();
     notifyListeners();
   }

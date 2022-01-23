@@ -7,7 +7,7 @@ import 'package:input_flutter/meta/views/auth/code.auth.dart';
 import 'package:input_flutter/meta/views/chat/home.chat.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-
+import 'package:universal_html/html.dart' as html;
 import '../../../app/constants/assets.constant.dart';
 import '../../../components/dialogs/custom_snackbars.dart';
 import '../../../core/notifiers/auth.notifier.dart';
@@ -15,6 +15,7 @@ import '../../../core/notifiers/connectivity.notifier.dart';
 import '../../../core/notifiers/root.page_controller.notifier.dart';
 import '../../../core/notifiers/socket.notifier.dart';
 import '../../utils/app_theme.dart';
+import '../drawer/custom_drawer.dart';
 
 class RootAuth extends StatefulWidget {
   bool isSessionAvailable;
@@ -37,13 +38,15 @@ class _RootAuthState extends State<RootAuth>
     Timer.periodic(const Duration(seconds: 1), (Timer t) => _getTime());
     super.initState();
     Future.delayed(const Duration(milliseconds: 300), () {
-      getUserDetails(widget.id!);
+      getUserDetails(widget.id);
     });
+
+    listenTabState();
   }
 
-  void getUserDetails(String id) {
+  void getUserDetails(String? id) {
     if (widget.isSessionAvailable) {
-      context.read<AuthNotifier>().renewSession(id).then((value) async {
+      context.read<AuthNotifier>().renewSession(id!).then((value) async {
         if (value) {
           String? name = await context.read<AuthNotifier>().getUserName();
           context.read<RootPageNotifier>().animateToIndex(1);
@@ -65,13 +68,15 @@ class _RootAuthState extends State<RootAuth>
       });
     }
   }
-
+  final GlobalKey<ScaffoldState> _key = GlobalKey();
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+      key: _key,
+      resizeToAvoidBottomInset: true,
       extendBodyBehindAppBar: true,
+      drawer: const CustomDrawer(),
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(0.1.sh.sm),
         child: AppBar(
@@ -81,18 +86,26 @@ class _RootAuthState extends State<RootAuth>
             builder: (BuildContext context, authNotifier, Widget? child) {
               return authNotifier.currentSpyder.userId != null &&
                       authNotifier.currentSpyder.userId != ""
-                  ? Tooltip(
-                      message: "Destroy Session",
-                      child: IconButton(
+                  ? (size.width < 800)
+                      // Display hamburger icon for mobile
+                      ? IconButton(
                           onPressed: () {
-                            authNotifier.destroyUserState();
-                            context.read<RootPageNotifier>().animateToIndex(0);
-                          },
-                          icon: const Icon(
-                            Icons.arrow_back_ios,
-                            color: Colors.white,
-                          )),
-                    )
+                            Scaffold.of(context).openDrawer();
+                          }, icon: const Icon(Icons.menu, color: Colors.white,))
+                      // Back icon fir web
+                      : Tooltip(
+                          message: "Destroy Session",
+                          child: IconButton(
+                              onPressed: () {
+                                context
+                                    .read<RootPageNotifier>()
+                                    .animateToIndex(0);
+                              },
+                              icon: const Icon(
+                                Icons.arrow_back_ios,
+                                color: Colors.white,
+                              )),
+                        )
                   : const SizedBox.shrink();
             },
           ),
@@ -121,8 +134,9 @@ class _RootAuthState extends State<RootAuth>
                       rootPageNotifier.updatePageIndex(index);
                       if (index == 0) {
                         context.read<SocketNotifier>().disconnectServer();
+                        context.read<AuthNotifier>().destroyUserState();
                       } else {
-                        context.read<SocketNotifier>().init();
+                        context.read<SocketNotifier>().init(context);
                       }
                     },
                     children: const [CodeAuth(), HomeChat()],
@@ -182,4 +196,11 @@ class _RootAuthState extends State<RootAuth>
   @override
   // TODO: implement wantKeepAlive
   bool get wantKeepAlive => true;
+
+  void listenTabState() {
+    html.window.onBeforeUnload.listen((event) async {
+      print(event);
+      context.read<SocketNotifier>().disconnectServer();
+    });
+  }
 }

@@ -39,18 +39,19 @@ class _CodeAuthState extends State<CodeAuth>
 
   void _trySubmit() async {
     final isValid = _formKey.currentState?.validate() ?? false;
+    FocusScope.of(context).unfocus();
     if (isValid) {
+      String secretCode = secretCodeController.text.trim();
+      secretCodeController.clear();
       setState(() {
         verifying = true;
       });
 
       if(context.read<ConnectionNotifier>().isOnline){
         // CALL VERIFY METHOD
-        context.read<AuthNotifier>().verifySecret(secretCodeController.text.trim()).then((value){
+        context.read<AuthNotifier>().verifySecret(secretCode).then((value){
           if(value){
-            secretCodeController.clear();
             context.read<RootPageNotifier>().animateToIndex(1);
-
             CustomSnackBar.openIconSnackBar(context, "</${context.read<AuthNotifier>().currentSpyder.name}>", const Icon(Icons.done));
           }else{
             CustomSnackBar.openErrorSnackBar(context, "An error has occurred",);
@@ -146,6 +147,7 @@ class _CodeAuthState extends State<CodeAuth>
       onSubmit: (str) {
         !verifying ? _trySubmit() : null;
       },
+      align: TextAlign.center,
     );
   }
 
