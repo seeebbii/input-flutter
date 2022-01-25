@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:input_flutter/core/models/active_users.model.dart';
 import 'package:input_flutter/core/notifiers/chat.notifier.dart';
@@ -8,7 +10,6 @@ import 'package:provider/provider.dart';
 import '../models/chat.model.dart';
 
 class SocketNotifier extends ChangeNotifier {
-
   ChatNotifier? _chatNotifier;
   late BuildContext context;
   late IO.Socket socket;
@@ -28,15 +29,16 @@ class SocketNotifier extends ChangeNotifier {
   //   }
   // }
 
-
-  void emitChatMessage(ChatModel chatModel){
+  void emitChatMessage(ChatModel chatModel) {
     socket.emit('receive_message', chatModel.toJson());
     notifyListeners();
-  } 
+  }
 
   void connectServer() {
     socket = IO.io('https://input-server.herokuapp.com/', <String, dynamic>{
-      'transports': ['websocket', ],
+      'transports': [
+        'websocket',
+      ],
       'autoConnect': false,
     }).connect();
 
@@ -46,17 +48,39 @@ class SocketNotifier extends ChangeNotifier {
       String? name = SharedPref().pref.getString('name');
       String? userId = SharedPref().pref.getString('user-id');
       mySocketId = val['Socket-Id'];
+
+
       context.read<ChatNotifier>().addActiveUser(ActiveUsersModel(userId: userId, socketId: mySocketId, name: name));
-      socket.emit('socket-connection-success', {"socketId" : mySocketId,"connectionStatus": "Connected", "userName": name, "userId": userId, });
+      socket.emit('socket-connection-success', {
+        "socketId": mySocketId,
+        "connectionStatus": "Connected",
+        "userName": name,
+        "userId": userId,
+      });
 
       // Adding active users to list
       // context.read<ChatNotifier>().addActiveUser();
 
       // Adding previous chats to list
       Iterable oldChatIterable = val['old-chat'];
-      List<ChatModel> oldChats = oldChatIterable.map((e) => ChatModel.fromJson(e)).toList();
+      List<ChatModel> oldChats =
+          oldChatIterable.map((e) => ChatModel.fromJson(e)).toList();
       context.read<ChatNotifier>().addPreviousChatMessages(oldChats);
       notifyListeners();
+
+      // HITTING NEW USER EVENT TO GET BROADCAST OF NEW USER IN CHAT
+      // socket.emit('new-user', true);
+    });
+
+    socket.on('listen-new-user', (activeUser) {
+      print(activeUser);
+      if (activeUser != null) {
+        // activeUser = jsonDecode(activeUser);
+        final name = activeUser['userName'];
+        final socketId = activeUser['socketId'];
+        final userId = activeUser['userId'];
+        context.read<ChatNotifier>().addActiveUser(ActiveUsersModel(userId: userId, socketId: socketId, name: name));
+      }
     });
 
     socket.on('disconncted', (disc) {
@@ -69,7 +93,6 @@ class SocketNotifier extends ChangeNotifier {
       context.read<ChatNotifier>().addNewMessage(newChatMessage);
     });
 
-
     // TODO :: SOCKET CORE EVENTS
 
     socket.onConnect((val) {
@@ -77,16 +100,16 @@ class SocketNotifier extends ChangeNotifier {
     });
 
     socket.onReconnect(
-            (_) => debugPrint("Socket Couldn't connect reconnecting to"));
+        (_) => debugPrint("Socket Couldn't connect reconnecting to"));
 
     socket.onReconnectAttempt(
-          (_) {
+      (_) {
         debugPrint("Socket Couldn't connect reconnect attempting");
       },
     );
 
     socket.onReconnectFailed(
-          (error) {
+      (error) {
         debugPrint('Socket Socket reconnect failed due to $error');
       },
     );
@@ -105,7 +128,12 @@ class SocketNotifier extends ChangeNotifier {
   void disconnectServer() {
     String? name = SharedPref().pref.getString('name');
     String? userId = SharedPref().pref.getString('user-id');
-    socket.emit('socket-disconnected', {"socketId" : mySocketId,"connectionStatus": "Disconnected", "userName": name, "userId": userId, });
+    socket.emit('socket-disconnected', {
+      "socketId": mySocketId,
+      "connectionStatus": "Disconnected",
+      "userName": name,
+      "userId": userId,
+    });
 
     // Removing socket from active users list
     // context.read<ChatNotifier>().removeActiveUser();
