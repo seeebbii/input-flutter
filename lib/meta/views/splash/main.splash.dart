@@ -39,7 +39,7 @@ class _MainSplashState extends State<MainSplash> with SingleTickerProviderStateM
     Future.delayed(const Duration(milliseconds: 800), toggleImageBool);
     Future.delayed(const Duration(milliseconds: 1200), toggleTextBool);
     // REMOVING SPLASH SCREEN
-    Future.delayed(const Duration(seconds: 2), ()=> navigationController.getOffAll(RouteGenerator.authDecider));
+    Future.delayed(const Duration(seconds: 10), ()=> navigationController.getOffAll(RouteGenerator.authDecider));
   }
 
 
@@ -55,7 +55,7 @@ class _MainSplashState extends State<MainSplash> with SingleTickerProviderStateM
               ),
           ),
           child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 7.0, sigmaY: 7.0),
+            filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
             child: Center(
               child: Column(
                 // mainAxisAlignment: MainAxisAlignment.center,

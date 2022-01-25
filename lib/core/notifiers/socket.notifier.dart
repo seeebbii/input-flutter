@@ -1,4 +1,5 @@
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:input_flutter/core/models/active_users.model.dart';
 import 'package:input_flutter/core/notifiers/chat.notifier.dart';
 import 'package:input_flutter/meta/utils/shared_pref.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
@@ -45,17 +46,26 @@ class SocketNotifier extends ChangeNotifier {
       String? name = SharedPref().pref.getString('name');
       String? userId = SharedPref().pref.getString('user-id');
       mySocketId = val['Socket-Id'];
+      context.read<ChatNotifier>().addActiveUser(ActiveUsersModel(userId: userId, socketId: mySocketId, name: name));
       socket.emit('socket-connection-success', {"socketId" : mySocketId,"connectionStatus": "Connected", "userName": name, "userId": userId, });
+
+      // Adding active users to list
+      // context.read<ChatNotifier>().addActiveUser();
+
+      // Adding previous chats to list
+      Iterable oldChatIterable = val['old-chat'];
+      List<ChatModel> oldChats = oldChatIterable.map((e) => ChatModel.fromJson(e)).toList();
+      context.read<ChatNotifier>().addPreviousChatMessages(oldChats);
       notifyListeners();
     });
 
-    socket.on('disconnect', (val) {
-
+    socket.on('disconncted', (disc) {
+      String socketId = disc['socket-id'].toString();
+      context.read<ChatNotifier>().removeActiveUser(socketId);
     });
 
     socket.on('send_message', (chatModelObject) {
       ChatModel newChatMessage = ChatModel.fromJson(chatModelObject);
-      print(newChatMessage);
       context.read<ChatNotifier>().addNewMessage(newChatMessage);
     });
 
@@ -96,6 +106,10 @@ class SocketNotifier extends ChangeNotifier {
     String? name = SharedPref().pref.getString('name');
     String? userId = SharedPref().pref.getString('user-id');
     socket.emit('socket-disconnected', {"socketId" : mySocketId,"connectionStatus": "Disconnected", "userName": name, "userId": userId, });
+
+    // Removing socket from active users list
+    // context.read<ChatNotifier>().removeActiveUser();
+
     socket.disconnect();
     notifyListeners();
   }

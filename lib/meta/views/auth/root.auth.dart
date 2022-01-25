@@ -123,7 +123,7 @@ class _RootAuthState extends State<RootAuth>
               ),
             ),
             child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 7.0, sigmaY: 7.0),
+              filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
               child: Consumer<RootPageNotifier>(
                 builder:
                     (BuildContext context, rootPageNotifier, Widget? child) {

@@ -23,6 +23,7 @@ class _MobileChatWidgetState extends State<MobileChatWidget> {
 
   // final scrollController = ScrollController();
   final sendMessageController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
 
   Widget _buildSendMessageField() {
     return MyTextField(
@@ -34,7 +35,7 @@ class _MobileChatWidgetState extends State<MobileChatWidget> {
       keyType: TextInputType.text,
       validator: (str) {
         if (str == null || str == '') {
-          return "?";
+          return "Returned with exit code 1";
         }
         return null;
       },
@@ -70,16 +71,19 @@ class _MobileChatWidgetState extends State<MobileChatWidget> {
   // }
 
   void sendMessage(){
-    final authNotifier = Provider.of<AuthNotifier>(context, listen: false);
-    ChatModel newChat = ChatModel(
-        userId: "${authNotifier.currentSpyder.userId}",
-        name: "${authNotifier.currentSpyder.name}",
-        messageId: "",
-        sentDate: DateTime.now(),
-        message: sendMessageController.text.trim());
+    final isValid = _formKey.currentState?.validate() ?? false;
+    if(isValid){
+      final authNotifier = Provider.of<AuthNotifier>(context, listen: false);
+      ChatModel newChat = ChatModel(
+          userId: "${authNotifier.currentSpyder.userId}",
+          name: "${authNotifier.currentSpyder.name}",
+          messageId: "",
+          sentDate: DateTime.now(),
+          message: sendMessageController.text.trim());
 
-    context.read<SocketNotifier>().emitChatMessage(newChat);
-    sendMessageController.clear();
+      context.read<SocketNotifier>().emitChatMessage(newChat);
+      sendMessageController.clear();
+    }
   }
 
 
@@ -103,15 +107,18 @@ class _MobileChatWidgetState extends State<MobileChatWidget> {
             ),
             Container(
               width: double.infinity,
-              child: Row(
-                children: [
-                  SizedBox(width: 5.sm,),
-                  Expanded(child: _buildSendMessageField()),
-                  OutlinedButton(onPressed: sendMessage , child: Icon(Icons.send, color: AppTheme.darkLightColor, size: 20.sm,),
-                    style: OutlinedButton.styleFrom(
-                        shadowColor: Colors.transparent
-                    ),)
-                ],
+              child: Form(
+                key: _formKey,
+                child: Row(
+                  children: [
+                    SizedBox(width: 5.sm,),
+                    Expanded(child: _buildSendMessageField()),
+                    OutlinedButton(onPressed: sendMessage , child: Icon(Icons.send, color: AppTheme.darkLightColor, size: 20.sm,),
+                      style: OutlinedButton.styleFrom(
+                          shadowColor: Colors.transparent
+                      ),)
+                  ],
+                ),
               ),
             ),
           ],

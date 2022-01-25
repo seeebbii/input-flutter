@@ -61,6 +61,7 @@ class MyTextField extends StatelessWidget {
         autovalidateMode: validateMode,
         inputFormatters: formatter,
         decoration: InputDecoration(
+          contentPadding: EdgeInsets.all(3.sm),
           border: InputBorder.none,
           hintText: hintText,
           hintStyle: Theme
